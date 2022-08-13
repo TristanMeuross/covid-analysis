@@ -2,7 +2,7 @@
 import sqlite3
 import pandas as pd
 
-from modules.my_modules import upload_gsheets, format_gsheets
+from modules.my_modules import upload_gsheets
 
 conn = sqlite3.connect('covid.db')
 c = conn.cursor()
@@ -53,36 +53,48 @@ ORDER BY dea.location, dea.date
 
 covid_summary_df = pd.read_sql_query(QUERY, conn)
 covid_summary_df['date'] = pd.to_datetime(
-    covid_summary_df['date'], format='%Y/%m/%d')
+    covid_summary_df['date'],
+    format='%Y/%m/%d'
+)
 
-WORKBOOK_NAME = 'covid-summary'
+covid_summary_africa_df = covid_summary_df.loc[covid_summary_df['continent'] == 'Africa']
+covid_summary_asia_df = covid_summary_df.loc[covid_summary_df['continent'] == 'Asia']
+covid_summary_europe_df = covid_summary_df.loc[covid_summary_df['continent'] == 'Europe']
+covid_summary_north_america_df = covid_summary_df.loc[
+    covid_summary_df['continent'] == 'North America']
+covid_summary_oceania_df = covid_summary_df.loc[covid_summary_df['continent'] == 'Oceania']
+covid_summary_south_america_df = covid_summary_df.loc[
+    covid_summary_df['continent'] == 'South America']
+
+
 upload_gsheets(
-    WORKBOOK_NAME,
-    [covid_summary_df],
+    'covid-summary-africa',
+    [covid_summary_africa_df],
     sheets=[0]
 )
-
-format_gsheets(
-    WORKBOOK_NAME,
-    'G:H',
-    'NUMBER',
-    '0.00',
+upload_gsheets(
+    'covid-summary-asia',
+    [covid_summary_asia_df],
     sheets=[0]
 )
-
-format_gsheets(
-    WORKBOOK_NAME,
-    'K:L',
-    'NUMBER',
-    '0.00',
+upload_gsheets(
+    'covid-summary-europe',
+    [covid_summary_europe_df],
     sheets=[0]
 )
-
-format_gsheets(
-    WORKBOOK_NAME,
-    'M:N',
-    'NUMBER',
-    '0.00',
+upload_gsheets(
+    'covid-summary-north-america',
+    [covid_summary_north_america_df],
+    sheets=[0]
+)
+upload_gsheets(
+    'covid-summary-oceania',
+    [covid_summary_oceania_df],
+    sheets=[0]
+)
+upload_gsheets(
+    'covid-summary-south-america',
+    [covid_summary_south_america_df],
     sheets=[0]
 )
 
